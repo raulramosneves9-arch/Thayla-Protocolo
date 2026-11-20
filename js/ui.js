@@ -647,13 +647,13 @@ function drawTitleGame(g) {
 
   /* lua */
   g.globalAlpha = 0.5;
-  fillCircle(g, 388, 60, 20, '#cdd8e0');
-  fillCircle(g, 396, 56, 18, '#0a1520');
+  fillCircle(g, VIEW_W - 92, 60, 20, '#cdd8e0');
+  fillCircle(g, VIEW_W - 84, 56, 18, '#0a1520');
   g.globalAlpha = 1;
 
   /* silhueta da cidade */
   var rnd = makeRng(20241103);
-  for (var i = 0; i < 26; i++) {
+  for (var i = 0; i < Math.ceil(VIEW_W / 20) + 2; i++) {
     var bw = 16 + rnd() * 42;
     var bh = 40 + rnd() * 110;
     var bx = i * 20 - 10 + rnd() * 8;
@@ -675,7 +675,7 @@ function drawTitleGame(g) {
   g.fillStyle = '#080b10';
   g.fillRect(0, VIEW_H - 46, VIEW_W, 46);
   g.globalAlpha = 0.18;
-  fillEllipse(g, 240, VIEW_H - 30, 180, 12, '#4a7a90');
+  fillEllipse(g, VIEW_W / 2, VIEW_H - 30, 180, 12, '#4a7a90');
   g.globalAlpha = 1;
 
   /* chuva */

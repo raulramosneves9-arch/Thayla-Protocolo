@@ -34,10 +34,24 @@ function resizeCanvas() {
   if (!CANVAS) return;
   var cw = Math.max(320, window.innerWidth), ch = Math.max(180, window.innerHeight);
   CANVAS.width = cw; CANVAS.height = ch;
-  var s = Math.min(cw / VIEW_W, ch / VIEW_H);
-  Render.scale = s;
-  Render.ox = (cw - VIEW_W * s) / 2;
-  Render.oy = (ch - VIEW_H * s) / 2;
+  if (cw / ch >= 480 / 270) {
+    VIEW_H = 270;
+    VIEW_W = Math.ceil(cw / (ch / VIEW_H));
+    Render.scale = ch / VIEW_H;
+  } else {
+    VIEW_W = 480;
+    VIEW_H = Math.ceil(ch / (cw / VIEW_W));
+    Render.scale = cw / VIEW_W;
+  }
+  Render.ox = 0;
+  Render.oy = 0;
+  if (GAME_CANVAS) {
+    GAME_CANVAS.width = VIEW_W;
+    GAME_CANVAS.height = VIEW_H;
+    GCTX = GAME_CANVAS.getContext('2d');
+    GCTX.imageSmoothingEnabled = false;
+  }
+  if (typeof initRain === 'function') initRain();
   CTX = CANVAS.getContext('2d');
   CTX.imageSmoothingEnabled = false;
 }

@@ -40,8 +40,8 @@ function drawRain(g) {
 
   g.fillStyle = 'rgba(170,198,220,0.10)';
   for (var j = 0; j < 22; j++) {
-    var sx = (j * 73 + (tGlobal * 40) % 480) % 480;
-    var sy = (j * 47 + (tGlobal * 70) % 270) % 270;
+    var sx = (j * 73 + (tGlobal * 40) % VIEW_W) % VIEW_W;
+    var sy = (j * 47 + (tGlobal * 70) % VIEW_H) % VIEW_H;
     g.fillRect(sx, sy, 1, 1);
   }
 }
@@ -323,6 +323,8 @@ function drawFloaters(g) {
 function ensureLight() {
   if (!lightCanvas) {
     lightCanvas = document.createElement('canvas');
+  }
+  if (lightCanvas.width !== VIEW_W || lightCanvas.height !== VIEW_H) {
     lightCanvas.width = VIEW_W;
     lightCanvas.height = VIEW_H;
     lctx = lightCanvas.getContext('2d');

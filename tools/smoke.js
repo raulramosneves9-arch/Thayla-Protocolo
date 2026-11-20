@@ -142,6 +142,31 @@ check('title frames', () => step(30));
 check('new game', () => g.newGame());
 check('intro dialogue frames', () => step(10));
 
+check('tela preenchida em diferentes proporções', () => {
+  g.innerWidth = 1600;
+  g.innerHeight = 720;
+  g.resizeCanvas();
+  step(2);
+  if (g.VIEW_W <= 480 || g.VIEW_H !== 270) throw new Error('viewport lógico não expandiu: ' + g.VIEW_W + 'x' + g.VIEW_H);
+  if (g.Render.ox !== 0 || g.Render.oy !== 0) throw new Error('render ainda possui barras');
+  if (g.Render.scale * g.VIEW_W < g.innerWidth || g.Render.scale * g.VIEW_H < g.innerHeight) {
+    throw new Error('render não cobre a tela');
+  }
+  g.innerWidth = 720;
+  g.innerHeight = 900;
+  g.resizeCanvas();
+  step(2);
+  if (g.VIEW_W !== 480 || g.VIEW_H <= 270) throw new Error('viewport lógico não expandiu na vertical: ' + g.VIEW_W + 'x' + g.VIEW_H);
+  if (g.Render.ox !== 0 || g.Render.oy !== 0) throw new Error('render ainda possui barras no formato vertical');
+  if (g.Render.scale * g.VIEW_W < g.innerWidth || g.Render.scale * g.VIEW_H < g.innerHeight) {
+    throw new Error('render não cobre a tela no formato vertical');
+  }
+  g.innerWidth = 1280;
+  g.innerHeight = 720;
+  g.resizeCanvas();
+  step(1);
+});
+
 log('estado:', g.__thayla.getState(), '| sala:', g.__thayla.getRoom() && g.__thayla.getRoom().id);
 
 // avança diálogo inicial
