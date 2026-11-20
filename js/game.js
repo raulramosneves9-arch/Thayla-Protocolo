@@ -73,8 +73,8 @@ function makeEnemy(type, x, y, uid) {
     walker: { hp: 105, speed: 26, dmg: 10, reach: 14, windup: 0.34, hw: 6, hh: 7 },
     crawler: { hp: 70, speed: 46, dmg: 8, reach: 12, windup: 0.26, hw: 7, hh: 4 },
     tick: { hp: 24, speed: 60, dmg: 5, reach: 9, windup: 0.16, hw: 4, hh: 3 },
-    queen: { hp: 520, speed: 22, dmg: 14, reach: 28, windup: 0.5, hw: 20, hh: 14 },
-    raul: { hp: 380, speed: 54, dmg: 16, reach: 16, windup: 0.35, hw: 6, hh: 7 }
+    queen: { hp: 1200, speed: 22, dmg: 14, reach: 28, windup: 0.5, hw: 20, hh: 14 },
+    raul: { hp: 2300, speed: 54, dmg: 16, reach: 16, windup: 0.35, hw: 6, hh: 7 }
   }[type] || { hp: 100, speed: 24, dmg: 10, reach: 14, windup: 0.34, hw: 6, hh: 7 };
 
   return {
@@ -220,7 +220,7 @@ function moveWithCollision(e, dx, dy) {
     for (i = 0; i < solids.length; i++) {
       s = solids[i];
       if (e.x + e.hw > s.x && e.x - e.hw < s.x + s.w &&
-          e.y + e.hh > s.y && e.y - e.hh < s.y + s.h) {
+        e.y + e.hh > s.y && e.y - e.hh < s.y + s.h) {
         if (dx > 0) e.x = s.x - e.hw;
         else e.x = s.x + s.w + e.hw;
       }
@@ -231,7 +231,7 @@ function moveWithCollision(e, dx, dy) {
     for (i = 0; i < solids.length; i++) {
       s = solids[i];
       if (e.x + e.hw > s.x && e.x - e.hw < s.x + s.w &&
-          e.y + e.hh > s.y && e.y - e.hh < s.y + s.h) {
+        e.y + e.hh > s.y && e.y - e.hh < s.y + s.h) {
         if (dy > 0) e.y = s.y - e.hh;
         else e.y = s.y + s.h + e.hh;
       }
@@ -1014,9 +1014,9 @@ function updatePlay(dt) {
 
   /* movimento */
   var mx = (Input.key('KeyD') || Input.key('ArrowRight') ? 1 : 0) -
-           (Input.key('KeyA') || Input.key('ArrowLeft') ? 1 : 0);
+    (Input.key('KeyA') || Input.key('ArrowLeft') ? 1 : 0);
   var my = (Input.key('KeyS') || Input.key('ArrowDown') ? 1 : 0) -
-           (Input.key('KeyW') || Input.key('ArrowUp') ? 1 : 0);
+    (Input.key('KeyW') || Input.key('ArrowUp') ? 1 : 0);
   var len = Math.hypot(mx, my);
   if (len > 0) { mx /= len; my /= len; }
 
