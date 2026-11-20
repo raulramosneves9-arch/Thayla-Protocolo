@@ -9,18 +9,34 @@
 <body>
   <canvas id="game"></canvas>
   <div id="boot">CLIQUE PARA INICIAR O ÁUDIO</div>
+  <div id="rotate-screen" role="status" aria-live="polite">
+    <div class="rotate-card">
+      <span class="rotate-phone-icon" aria-hidden="true"></span>
+      <strong>VIRE O CELULAR</strong>
+      <span>Este jogo foi feito para jogar com a tela na horizontal.</span>
+    </div>
+  </div>
   <div id="touch-controls" aria-label="Controles do jogo">
     <div id="move-stick" class="touch-stick" aria-label="Mover personagem">
       <span class="touch-stick-knob"></span>
     </div>
     <div class="touch-actions">
-      <button type="button" data-touch-fire>ATIRAR</button>
       <button type="button" data-touch-key="KeyE">USAR</button>
       <button type="button" data-touch-key="Space">ESQUIVA</button>
       <button type="button" data-touch-key="KeyF">FACA</button>
       <button type="button" data-touch-key="KeyI">BOLSA</button>
       <button type="button" data-touch-key="KeyH">ERVA</button>
       <button type="button" data-touch-key="KeyQ">ARMA</button>
+    </div>
+  </div>
+  <div id="mobile-tutorial">
+    <div class="tutorial-card" role="dialog" aria-labelledby="tutorial-title">
+      <p class="tutorial-eyebrow">CONTROLES PARA CELULAR</p>
+      <h1 id="tutorial-title">Como jogar</h1>
+      <p><b>Analógico esquerdo</b> — mover a personagem.</p>
+      <p><b>Toque e arraste no cenário</b> — mirar e atirar.</p>
+      <p><b>Botões à direita</b> — usar, esquivar, faca e itens.</p>
+      <button id="tutorial-dismiss" type="button">ENTENDI</button>
     </div>
   </div>
 

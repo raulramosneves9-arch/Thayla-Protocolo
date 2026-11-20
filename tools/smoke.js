@@ -33,8 +33,10 @@ function makeCtx() {
 }
 
 function makeCanvas() {
-  const c = { width: 300, height: 150, style: {}, getContext: null };
+  const c = { width: 300, height: 150, style: {}, getContext: null, listeners: {} };
   c.getContext = () => makeCtx();
+  c.addEventListener = (name, fn) => { (c.listeners[name] || (c.listeners[name] = [])).push(fn); };
+  c.dispatchEvent = e => (c.listeners[e.type] || []).forEach(fn => fn(e));
   return c;
 }
 
@@ -179,9 +181,12 @@ check('controles touch', () => {
 
 check('tiro', () => {
   const before = g.__thayla.inv().ammo9;
-  g.Input.touch.fire = true;
+  g.__canvas.dispatchEvent({
+    type: 'pointerdown', pointerType: 'touch', pointerId: 1,
+    clientX: 640, clientY: 360, preventDefault() {}
+  });
   step(20);
-  g.Input.touch.fire = false;
+  g.__canvas.dispatchEvent({ type: 'pointerup', pointerId: 1 });
   if (g.__thayla.inv().ammo9 >= before) throw new Error('munição não baixou');
 });
 step(30);

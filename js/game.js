@@ -1049,7 +1049,7 @@ function updatePlay(dt) {
     p.moving = false;
   }
 
-  if (Input.mouse.down || Input.touch.fire) shoot();
+  if (Input.mouse.down) shoot();
   if (Input.hit('KeyF')) melee();
 
   if (Input.hit('Tab') || Input.hit('KeyI')) { openInventory(); return; }

@@ -59,7 +59,7 @@ function engineInit() {
 var Input = {
   down: {}, pressed: {},
   mouse: { cx: 0, cy: 0, x: 0, y: 0, down: false, rdown: false, clicked: false, rclicked: false },
-  touch: { moveX: 0, moveY: 0, fire: false, down: {}, pressed: {} },
+  touch: { moveX: 0, moveY: 0, down: {}, pressed: {} },
   wheel: 0,
 
   init: function () {
@@ -103,27 +103,30 @@ var Input = {
     }
 
     var touchButtons = document.querySelectorAll ?
-      document.querySelectorAll('[data-touch-key], [data-touch-fire]') : [];
+      document.querySelectorAll('[data-touch-key]') : [];
     for (var b = 0; b < touchButtons.length; b++) {
       (function (button) {
         var code = button.getAttribute('data-touch-key');
-        var fire = button.hasAttribute('data-touch-fire');
         button.addEventListener('pointerdown', function (e) {
           e.preventDefault();
           button.setPointerCapture(e.pointerId);
-          if (fire) self.touch.fire = true;
-          else {
-            if (!self.touch.down[code]) self.touch.pressed[code] = true;
-            self.touch.down[code] = true;
-          }
+          if (!self.touch.down[code]) self.touch.pressed[code] = true;
+          self.touch.down[code] = true;
         });
         function releaseButton() {
-          if (fire) self.touch.fire = false;
-          else self.touch.down[code] = false;
+          self.touch.down[code] = false;
         }
         button.addEventListener('pointerup', releaseButton);
         button.addEventListener('pointercancel', releaseButton);
       })(touchButtons[b]);
+    }
+
+    var tutorialDismiss = document.getElementById('tutorial-dismiss');
+    var mobileTutorial = document.getElementById('mobile-tutorial');
+    if (tutorialDismiss && mobileTutorial) {
+      tutorialDismiss.addEventListener('click', function () {
+        mobileTutorial.classList.add('is-hidden');
+      });
     }
 
     if (CANVAS && CANVAS.addEventListener) {
