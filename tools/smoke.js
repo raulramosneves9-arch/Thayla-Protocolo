@@ -262,9 +262,13 @@ check('abre e fecha doc', () => {
   if (g.__thayla.getState() !== 'play') throw new Error('doc não fechou');
 });
 
-check('toque fecha documento', () => {
+check('toque no X fecha documento', () => {
   g.openDoc('boletim', 'play');
+  step(1);
   g.Input.touch.tap = true;
+  g.Input.mouse.clicked = true;
+  g.Input.mouse.x = g.docCloseRect.x + g.docCloseRect.w / 2;
+  g.Input.mouse.y = g.docCloseRect.y + g.docCloseRect.h / 2;
   step(1);
   if (g.__thayla.getState() !== 'play') throw new Error('toque não fechou o documento');
 });

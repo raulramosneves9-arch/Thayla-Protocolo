@@ -4,6 +4,7 @@
 
 var titleMenu = 0;
 var invRects = [], keypadRects = [], choiceRects = [], invCloseRect = null, invPanel = null;
+var docCloseRect = null;
 
 /* ---------- utilidades de UI ---------- */
 
@@ -202,7 +203,15 @@ function openDoc(id, from) {
 
 function updateDoc(dt) {
   if (!doc) { state = 'play'; return; }
-  if (Input.anyHit(['Escape', 'KeyE', 'Enter']) || Input.mouse.rclicked || Input.touch.tap) {
+  if (Input.anyHit(['Escape', 'KeyE', 'Enter']) || Input.mouse.rclicked) {
+    state = doc.from;
+    doc = null;
+    Sfx.ui();
+    return;
+  }
+  if (Input.mouse.clicked && docCloseRect &&
+      Input.mouse.x >= docCloseRect.x && Input.mouse.x <= docCloseRect.x + docCloseRect.w &&
+      Input.mouse.y >= docCloseRect.y && Input.mouse.y <= docCloseRect.y + docCloseRect.h) {
     state = doc.from;
     doc = null;
     Sfx.ui();
@@ -246,6 +255,11 @@ function drawDoc(g) {
   g.strokeStyle = '#8c8270';
   g.lineWidth = 1;
   g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+
+  docCloseRect = { x: x + w - 29, y: y + 7, w: 20, h: 18 };
+  fillRect(g, docCloseRect.x, docCloseRect.y, docCloseRect.w, docCloseRect.h, '#c9c1ad');
+  strokeRect(g, docCloseRect.x, docCloseRect.y, docCloseRect.w, docCloseRect.h, '#8c8270');
+  text(g, 'X', docCloseRect.x + docCloseRect.w / 2, docCloseRect.y + 12, 7.5, '#241d14', 'center', true);
 
   text(g, d.type, x + 16, y + 20, 6.2, '#857861', 'left', true);
   text(g, d.code, x + w - 16, y + 20, 5.8, '#8c8069', 'right');

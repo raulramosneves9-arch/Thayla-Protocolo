@@ -150,9 +150,11 @@ var Input = {
         canvasPointer = e.pointerId;
         self.mouse.cx = e.clientX;
         self.mouse.cy = e.clientY;
-        self.mouse.down = true;
         self.mouse.clicked = true;
         self.touch.tap = true;
+        if (typeof state !== 'undefined' && state === 'play') {
+          self.mouse.down = true;
+        }
       });
       CANVAS.addEventListener('pointermove', function (e) {
         if (e.pointerType === 'touch' && e.pointerId === canvasPointer) {
