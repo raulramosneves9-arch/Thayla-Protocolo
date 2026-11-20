@@ -74,10 +74,10 @@ window.LORE = {
       code: 'caderno molhado — 12/09',
       title: 'Raul Tickmann',
       body: [
-        'Eu queria curar a Helena. Só isso.',
-        'A degeneração óssea dela não ia esperar por comitê de ética. O carrapato sintético regenera tecido. Funcionou. Funcionou demais.',
+        'Eu queria curar o Thiago. Só isso.',
+        'A degeneração óssea dele não ia esperar por comitê de ética. O carrapato sintético regenera tecido. Funcionou. Funcionou demais.',
         'Ele não para de regenerar. O que morre, volta. E o que volta não lembra de ser gente — mas lembra de ter fome.',
-        'A Helena voltou por quarenta minutos. Ela me olhou. Ela sabia o meu nome. Depois, só havia dentes.',
+        'O Thiago voltou por quarenta minutos. Ele me olhou. Ele sabia o meu nome. Depois, só havia dentes.',
         'Amanhã eu me injeto o A-3. Se for seguro em mim, é seguro para a cidade. Se não for... que a cidade me perdoe.'
       ]
     },
@@ -91,7 +91,7 @@ window.LORE = {
         'Sinto as pessoas pela temperatura. Sinto a Thayla vindo pela cidade como quem sente a chuva antes dela cair. Ela vai me matar. Eu mereço.',
         'Mas se ela chegar ao laboratório, talvez haja uma saída. O Soro R-7 precisa de três coisas: o meu sangue, o núcleo da rainha e o reagente A-3.',
         'Deixei tudo escrito na bancada. Deixei o caminho aberto. Fiz da minha covardia uma trilha para ela.',
-        'A rainha está no esgoto, no ninho. Não a matem sem extrair o núcleo. E não me deixem virar o que a Helena virou.'
+        'A rainha está no esgoto, no ninho. Não a matem sem extrair o núcleo. E não me deixem virar o que o Thiago virou.'
       ]
     },
 
