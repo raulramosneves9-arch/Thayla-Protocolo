@@ -73,8 +73,8 @@ function makeEnemy(type, x, y, uid) {
     walker: { hp: 105, speed: 26, dmg: 10, reach: 14, windup: 0.34, hw: 6, hh: 7 },
     crawler: { hp: 70, speed: 46, dmg: 8, reach: 12, windup: 0.26, hw: 7, hh: 4 },
     tick: { hp: 24, speed: 60, dmg: 5, reach: 9, windup: 0.16, hw: 4, hh: 3 },
-    queen: { hp: 1200, speed: 22, dmg: 14, reach: 28, windup: 0.5, hw: 20, hh: 14 },
-    raul: { hp: 2300, speed: 54, dmg: 16, reach: 16, windup: 0.35, hw: 6, hh: 7 }
+    queen: { hp: 600, speed: 22, dmg: 14, reach: 28, windup: 0.5, hw: 20, hh: 14 },
+    raul: { hp: 1200, speed: 54, dmg: 16, reach: 16, windup: 0.35, hw: 6, hh: 7 }
   }[type] || { hp: 100, speed: 24, dmg: 10, reach: 14, windup: 0.34, hw: 6, hh: 7 };
 
   return {

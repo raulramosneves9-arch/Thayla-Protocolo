@@ -52,6 +52,9 @@ function drawRain(g) {
 
 function render() {
   var g = GCTX;
+  if (document.body && document.body.classList) {
+    document.body.classList.toggle('touch-modal', state === 'dialogue' || state === 'doc');
+  }
   g.setTransform(1, 0, 0, 1, 0, 0);
   g.fillStyle = '#04060a';
   g.fillRect(0, 0, VIEW_W, VIEW_H);

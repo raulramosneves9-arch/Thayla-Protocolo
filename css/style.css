@@ -44,6 +44,10 @@ canvas#game {
   display: none;
 }
 
+body.touch-modal #touch-controls {
+  visibility: hidden;
+}
+
 @keyframes blink {
   0%, 100% { opacity: .25; }
   50% { opacity: .9; }

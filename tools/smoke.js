@@ -247,6 +247,13 @@ check('abre e fecha doc', () => {
   if (g.__thayla.getState() !== 'play') throw new Error('doc não fechou');
 });
 
+check('toque fecha documento', () => {
+  g.openDoc('boletim', 'play');
+  g.Input.touch.tap = true;
+  step(1);
+  if (g.__thayla.getState() !== 'play') throw new Error('toque não fechou o documento');
+});
+
 log('--- teclado ---');
 check('código errado e certo', () => {
   g.keypadOpen();

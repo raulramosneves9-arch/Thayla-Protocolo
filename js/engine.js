@@ -73,7 +73,7 @@ function engineInit() {
 var Input = {
   down: {}, pressed: {},
   mouse: { cx: 0, cy: 0, x: 0, y: 0, down: false, rdown: false, clicked: false, rclicked: false },
-  touch: { moveX: 0, moveY: 0, down: {}, pressed: {} },
+  touch: { moveX: 0, moveY: 0, tap: false, down: {}, pressed: {} },
   wheel: 0,
 
   init: function () {
@@ -152,6 +152,7 @@ var Input = {
         self.mouse.cy = e.clientY;
         self.mouse.down = true;
         self.mouse.clicked = true;
+        self.touch.tap = true;
       });
       CANVAS.addEventListener('pointermove', function (e) {
         if (e.pointerType === 'touch' && e.pointerId === canvasPointer) {
@@ -232,6 +233,7 @@ var Input = {
   endFrame: function () {
     this.pressed = {};
     this.touch.pressed = {};
+    this.touch.tap = false;
     this.mouse.clicked = false;
     this.mouse.rclicked = false;
     this.wheel = 0;

@@ -162,7 +162,9 @@ function drawDialogue(g) {
   var line = dlg.lines[dlg.i];
   if (!line) return;
 
-  var bx = 18, by = 186, bw = 444, bh = 68;
+  var bw = Math.min(444, VIEW_W - 36), bh = 68;
+  var bx = (VIEW_W - bw) / 2;
+  var by = (VIEW_H - bh) / 2 + 20;
   panelBox(g, bx, by, bw, bh, 0.9);
 
   if (line.who) {
@@ -200,7 +202,7 @@ function openDoc(id, from) {
 
 function updateDoc(dt) {
   if (!doc) { state = 'play'; return; }
-  if (Input.anyHit(['Escape', 'KeyE', 'Enter']) || Input.mouse.rclicked) {
+  if (Input.anyHit(['Escape', 'KeyE', 'Enter']) || Input.mouse.rclicked || Input.touch.tap) {
     state = doc.from;
     doc = null;
     Sfx.ui();
@@ -235,7 +237,8 @@ function drawDoc(g) {
   g.fillStyle = 'rgba(2,4,8,0.7)';
   g.fillRect(0, 0, VIEW_W, VIEW_H);
 
-  var x = 36, y = 12, w = 408, h = 246;
+  var w = Math.min(408, VIEW_W - 32), h = Math.min(246, VIEW_H - 24);
+  var x = (VIEW_W - w) / 2, y = (VIEW_H - h) / 2;
   g.fillStyle = '#d9d2c0';
   g.fillRect(x, y, w, h);
   g.fillStyle = '#c9c1ad';
