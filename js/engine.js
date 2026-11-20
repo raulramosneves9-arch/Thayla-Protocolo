@@ -59,10 +59,97 @@ function engineInit() {
 var Input = {
   down: {}, pressed: {},
   mouse: { cx: 0, cy: 0, x: 0, y: 0, down: false, rdown: false, clicked: false, rclicked: false },
+  touch: { moveX: 0, moveY: 0, fire: false, down: {}, pressed: {} },
   wheel: 0,
 
   init: function () {
     var self = this;
+    var moveStick = document.getElementById('move-stick');
+    var moveKnob = moveStick && moveStick.querySelector('.touch-stick-knob');
+    var movePointer = null;
+    var canvasPointer = null;
+
+    function updateMoveStick(e) {
+      var rect = moveStick.getBoundingClientRect();
+      var radius = Math.max(1, Math.min(rect.width, rect.height) / 2 - 24);
+      var dx = e.clientX - (rect.left + rect.width / 2);
+      var dy = e.clientY - (rect.top + rect.height / 2);
+      var length = Math.hypot(dx, dy);
+      if (length > radius) { dx *= radius / length; dy *= radius / length; }
+      self.touch.moveX = dx / radius;
+      self.touch.moveY = dy / radius;
+      if (moveKnob) moveKnob.style.transform =
+        'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+    }
+
+    if (moveStick) {
+      moveStick.addEventListener('pointerdown', function (e) {
+        e.preventDefault();
+        movePointer = e.pointerId;
+        moveStick.setPointerCapture(e.pointerId);
+        updateMoveStick(e);
+      });
+      moveStick.addEventListener('pointermove', function (e) {
+        if (e.pointerId === movePointer) updateMoveStick(e);
+      });
+      function releaseMove(e) {
+        if (e.pointerId !== movePointer) return;
+        movePointer = null;
+        self.touch.moveX = self.touch.moveY = 0;
+        if (moveKnob) moveKnob.style.transform = 'translate(-50%, -50%)';
+      }
+      moveStick.addEventListener('pointerup', releaseMove);
+      moveStick.addEventListener('pointercancel', releaseMove);
+    }
+
+    var touchButtons = document.querySelectorAll ?
+      document.querySelectorAll('[data-touch-key], [data-touch-fire]') : [];
+    for (var b = 0; b < touchButtons.length; b++) {
+      (function (button) {
+        var code = button.getAttribute('data-touch-key');
+        var fire = button.hasAttribute('data-touch-fire');
+        button.addEventListener('pointerdown', function (e) {
+          e.preventDefault();
+          button.setPointerCapture(e.pointerId);
+          if (fire) self.touch.fire = true;
+          else {
+            if (!self.touch.down[code]) self.touch.pressed[code] = true;
+            self.touch.down[code] = true;
+          }
+        });
+        function releaseButton() {
+          if (fire) self.touch.fire = false;
+          else self.touch.down[code] = false;
+        }
+        button.addEventListener('pointerup', releaseButton);
+        button.addEventListener('pointercancel', releaseButton);
+      })(touchButtons[b]);
+    }
+
+    if (CANVAS && CANVAS.addEventListener) {
+      CANVAS.addEventListener('pointerdown', function (e) {
+        if (e.pointerType !== 'touch') return;
+        e.preventDefault();
+        canvasPointer = e.pointerId;
+        self.mouse.cx = e.clientX;
+        self.mouse.cy = e.clientY;
+        self.mouse.down = true;
+        self.mouse.clicked = true;
+      });
+      CANVAS.addEventListener('pointermove', function (e) {
+        if (e.pointerType === 'touch' && e.pointerId === canvasPointer) {
+          self.mouse.cx = e.clientX;
+          self.mouse.cy = e.clientY;
+        }
+      });
+      function releaseCanvas(e) {
+        if (e.pointerId !== canvasPointer) return;
+        canvasPointer = null;
+        self.mouse.down = false;
+      }
+      CANVAS.addEventListener('pointerup', releaseCanvas);
+      CANVAS.addEventListener('pointercancel', releaseCanvas);
+    }
 
     function codeOf(e) {
       if (e.code) return e.code;
@@ -127,20 +214,21 @@ var Input = {
 
   endFrame: function () {
     this.pressed = {};
+    this.touch.pressed = {};
     this.mouse.clicked = false;
     this.mouse.rclicked = false;
     this.wheel = 0;
   },
 
-  key: function (code) { return !!this.down[code]; },
-  hit: function (code) { return !!this.pressed[code]; },
+  key: function (code) { return !!(this.down[code] || this.touch.down[code]); },
+  hit: function (code) { return !!(this.pressed[code] || this.touch.pressed[code]); },
 
   any: function (codes) {
-    for (var i = 0; i < codes.length; i++) if (this.down[codes[i]]) return true;
+    for (var i = 0; i < codes.length; i++) if (this.key(codes[i])) return true;
     return false;
   },
   anyHit: function (codes) {
-    for (var i = 0; i < codes.length; i++) if (this.pressed[codes[i]]) return true;
+    for (var i = 0; i < codes.length; i++) if (this.hit(codes[i])) return true;
     return false;
   }
 };

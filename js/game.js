@@ -1014,9 +1014,9 @@ function updatePlay(dt) {
 
   /* movimento */
   var mx = (Input.key('KeyD') || Input.key('ArrowRight') ? 1 : 0) -
-    (Input.key('KeyA') || Input.key('ArrowLeft') ? 1 : 0);
+    (Input.key('KeyA') || Input.key('ArrowLeft') ? 1 : 0) + Input.touch.moveX;
   var my = (Input.key('KeyS') || Input.key('ArrowDown') ? 1 : 0) -
-    (Input.key('KeyW') || Input.key('ArrowUp') ? 1 : 0);
+    (Input.key('KeyW') || Input.key('ArrowUp') ? 1 : 0) + Input.touch.moveY;
   var len = Math.hypot(mx, my);
   if (len > 0) { mx /= len; my /= len; }
 
@@ -1049,7 +1049,7 @@ function updatePlay(dt) {
     p.moving = false;
   }
 
-  if (Input.mouse.down) shoot();
+  if (Input.mouse.down || Input.touch.fire) shoot();
   if (Input.hit('KeyF')) melee();
 
   if (Input.hit('Tab') || Input.hit('KeyI')) { openInventory(); return; }

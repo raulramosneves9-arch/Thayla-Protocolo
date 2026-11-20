@@ -9,6 +9,20 @@
 <body>
   <canvas id="game"></canvas>
   <div id="boot">CLIQUE PARA INICIAR O ÁUDIO</div>
+  <div id="touch-controls" aria-label="Controles do jogo">
+    <div id="move-stick" class="touch-stick" aria-label="Mover personagem">
+      <span class="touch-stick-knob"></span>
+    </div>
+    <div class="touch-actions">
+      <button type="button" data-touch-fire>ATIRAR</button>
+      <button type="button" data-touch-key="KeyE">USAR</button>
+      <button type="button" data-touch-key="Space">ESQUIVA</button>
+      <button type="button" data-touch-key="KeyF">FACA</button>
+      <button type="button" data-touch-key="KeyI">BOLSA</button>
+      <button type="button" data-touch-key="KeyH">ERVA</button>
+      <button type="button" data-touch-key="KeyQ">ARMA</button>
+    </div>
+  </div>
 
   <script src="js/engine.js"></script>
   <script src="js/audio.js"></script>

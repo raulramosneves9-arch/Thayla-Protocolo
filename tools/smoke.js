@@ -163,11 +163,25 @@ check('movimento', () => {
   if (!(p.x > startX + 20)) throw new Error('x não avançou: ' + p.x);
 });
 
+check('controles touch', () => {
+  const before = p.x;
+  g.Input.touch.moveX = -1;
+  step(30);
+  g.Input.touch.moveX = 0;
+  if (!(p.x < before - 20)) throw new Error('analógico não moveu: ' + p.x);
+
+  g.Input.touch.down.KeyF = true;
+  g.Input.touch.pressed.KeyF = true;
+  if (!g.Input.key('KeyF') || !g.Input.hit('KeyF')) throw new Error('ação touch não foi reconhecida');
+  g.Input.touch.down.KeyF = false;
+  g.Input.touch.pressed = {};
+});
+
 check('tiro', () => {
   const before = g.__thayla.inv().ammo9;
-  g.Input.mouse.down = true;
+  g.Input.touch.fire = true;
   step(20);
-  g.Input.mouse.down = false;
+  g.Input.touch.fire = false;
   if (g.__thayla.inv().ammo9 >= before) throw new Error('munição não baixou');
 });
 step(30);
