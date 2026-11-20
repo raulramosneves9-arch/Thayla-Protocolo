@@ -11,7 +11,7 @@ window.LORE = {
   intro: [
     { who: '', text: 'Guarannapuava City. 03h12. A chuva não para há três dias.' },
     { who: 'THAYLA', text: 'Três dias sem contato com a delegacia daqui. O último rádio repetiu uma palavra só: "cura".' },
-    { who: 'THAYLA', text: 'Sou Thayla Vaz, policial civil. Investigadora. Vim buscar respostas.' },
+    { who: 'THAYLA', text: 'Sou Thayla Kennedy, policial civil. Investigadora. Vim buscar respostas.' },
     { who: 'THAYLA', text: 'Dizem que o Dr. Raul Tickmann transformou a própria cidade em cobaia. A imprensa apelidou o desastre de UmbrellaRaulTick.' },
     { who: 'THAYLA', text: 'Raul... você era o melhor de nós. Antes de virar isso.' },
     { who: 'THAYLA', text: 'Se ainda existe um homem aí dentro, existe uma cura. E eu vou encontrá-la.' },
@@ -180,12 +180,12 @@ window.LORE = {
       { who: 'RAUL', text: 'Thayla. Você veio mesmo.' },
       { who: 'THAYLA', text: 'Raul. Ainda dá para te reconhecer. Isso é bom.' },
       { who: 'RAUL', text: 'Não chegue perto. A hora está acabando. Eu sinto a cidade chamando por dentro do meu peito.' },
-      { who: 'RAUL', text: 'Eu liberei o A-3 na estação de tratamento. Achei que fosse seguro. Achei que fosse meu. Olha o que eu fiz.' },
+      { who: 'RAUL', text: 'Eu liberei o A-3 na estação de tratamento. Achei que fosse seguro. Achei que fosse meu. Olha o que eu fiz. Quanta besteira, quanta IDIOTICE, como fui ingênuo.' },
       { who: 'THAYLA', text: 'Você escreveu o protocolo do soro. Você deixou o caminho aberto.' },
-      { who: 'RAUL', text: 'Covardia, não redenção. Eu não tive coragem de me matar, então deixei que você fizesse o trabalho.' },
+      { who: 'RAUL', text: 'Covardia, não redenção. Eu não tive coragem de me matar, então deixei que você fizesse o trabalho. Por favor, é o unico jeito.' },
       { who: 'RAUL', text: 'Está pronto? O soro está na sua mochila?' },
       { who: 'THAYLA', text: 'Está.' },
-      { who: 'RAUL', text: 'Então me segure, Thayla. Porque agora... agora eu não consigo mais parar.' }
+      { who: 'RAUL', text: 'Então me segure, Thayla. Porque agora... agora eu não consigo mais se-se-segurar' }
     ],
     raul_defeat: [
       { who: 'RAUL', text: 'Thayla... eu ainda estou aqui. Eu ainda estou aqui.' },
