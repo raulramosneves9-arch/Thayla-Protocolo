@@ -3,7 +3,7 @@
    ========================================================= */
 
 var titleMenu = 0;
-var invRects = [], keypadRects = [], choiceRects = [];
+var invRects = [], keypadRects = [], choiceRects = [], invCloseRect = null, invPanel = null;
 
 /* ---------- utilidades de UI ---------- */
 
@@ -297,12 +297,24 @@ function updateInv(dt) {
   if (Input.anyHit(['Tab', 'Escape', 'KeyI'])) { state = 'play'; Sfx.ui(); return; }
   if (Input.hit('KeyH')) { useHerb(); return; }
   if (Input.mouse.clicked) {
+    if (invCloseRect &&
+        Input.mouse.x >= invCloseRect.x && Input.mouse.x <= invCloseRect.x + invCloseRect.w &&
+        Input.mouse.y >= invCloseRect.y && Input.mouse.y <= invCloseRect.y + invCloseRect.h) {
+      state = 'play';
+      Sfx.ui();
+      return;
+    }
     for (var i = 0; i < invRects.length; i++) {
       var r = invRects[i];
       if (Input.mouse.x >= r.x && Input.mouse.x <= r.x + r.w &&
           Input.mouse.y >= r.y && Input.mouse.y <= r.y + r.h) {
         if (r.doc) { openDoc(r.doc, 'inv'); return; }
       }
+    }
+    if (Input.mouse.x < invPanel.x || Input.mouse.x > invPanel.x + invPanel.w ||
+        Input.mouse.y < invPanel.y || Input.mouse.y > invPanel.y + invPanel.h) {
+      state = 'play';
+      Sfx.ui();
     }
   }
 }
@@ -312,11 +324,17 @@ function drawInventory(g) {
   g.fillRect(0, 0, VIEW_W, VIEW_H);
   invRects = [];
 
-  var x = 24, y = 18, w = 432, h = 234;
+  var w = Math.min(432, VIEW_W - 32), h = Math.min(234, VIEW_H - 24);
+  var x = (VIEW_W - w) / 2, y = (VIEW_H - h) / 2;
+  invPanel = { x: x, y: y, w: w, h: h };
+  invCloseRect = { x: x + w - 35, y: y + 6, w: 24, h: 20 };
   panelBox(g, x, y, w, h, 0.94);
 
   text(g, 'INVENTÁRIO', x + 16, y + 20, 11, '#dce8f2', 'left', true);
-  text(g, 'THAYLA VAZ — INVESTIGADORA', x + w - 16, y + 19, 6, '#5f8098', 'right');
+  text(g, 'THAYLA VAZ — INVESTIGADORA', x + w - 48, y + 19, 6, '#5f8098', 'right');
+  fillRect(g, invCloseRect.x, invCloseRect.y, invCloseRect.w, invCloseRect.h, '#17232e');
+  strokeRect(g, invCloseRect.x, invCloseRect.y, invCloseRect.w, invCloseRect.h, 'rgba(120,150,175,0.5)');
+  text(g, 'X', invCloseRect.x + invCloseRect.w / 2, invCloseRect.y + 13, 8, '#c8d8e0', 'center', true);
   g.fillStyle = 'rgba(120,150,175,0.4)';
   g.fillRect(x + 16, y + 26, w - 32, 1);
 

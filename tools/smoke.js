@@ -223,6 +223,21 @@ check('inventário abre/fecha', () => {
   if (g.__thayla.getState() !== 'play') throw new Error('não fechou: ' + g.__thayla.getState());
 });
 
+check('inventário centralizado e fecha por toque', () => {
+  g.openInventory();
+  step(1);
+  if (!g.invPanel || Math.abs(g.invPanel.x + g.invPanel.w / 2 - g.VIEW_W / 2) > 1 ||
+      Math.abs(g.invPanel.y + g.invPanel.h / 2 - g.VIEW_H / 2) > 1) {
+    throw new Error('inventário fora do centro');
+  }
+  g.Input.mouse.cx = (g.invCloseRect.x + g.invCloseRect.w / 2) * g.Render.scale + g.Render.ox;
+  g.Input.mouse.cy = (g.invCloseRect.y + g.invCloseRect.h / 2) * g.Render.scale + g.Render.oy;
+  g.Input.mouse.clicked = true;
+  step(1);
+  g.Input.mouse.clicked = false;
+  if (g.__thayla.getState() !== 'play') throw new Error('toque não fechou o inventário');
+});
+
 log('--- salas ---');
 const rooms = ['delegacia', 'praca', 'farmacia', 'esgoto', 'laboratorio', 'terraco'];
 for (const r of rooms) {
