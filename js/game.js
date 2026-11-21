@@ -84,7 +84,8 @@ function makeEnemy(type, x, y, uid) {
     walkT: rand(0, 6), seed: rand(0, 6.28), aim: 0,
     flash: 0, stun: 0, atkCd: rand(0.3, 1.2), atkWind: 0,
     dead: false, deadT: 0, awake: false, touchCd: 0,
-    dash: 0, dashDir: 0, wind: 0, acidCd: 3.5, spawnCd: 6, kneeling: false
+    dash: 0, dashDir: 0, wind: 0, acidCd: 3.5, spawnCd: 6, kneeling: false,
+    form: 'human', transforming: false
   };
 }
 
@@ -345,13 +346,18 @@ function hurtEnemy(e, dmg, vx, vy) {
   e.hp -= dmg;
   e.flash = 0.09;
   e.stun = Math.max(e.stun, 0.07);
-  Sfx.hit();
+  Sfx.enemyHurt();
   bloodBurst(e.x, e.y, 3);
   shake = Math.max(shake, 1.6);
   if (vx || vy) {
     var a = Math.atan2(vy, vx);
     e.x += Math.cos(a) * 1.6;
     e.y += Math.sin(a) * 1.6;
+  }
+  if (e.type === 'raul' && !flags.raul_transformed && e.hp <= e.maxhp * 0.5) {
+    e.hp = Math.round(e.maxhp * 0.5);
+    maybeTransformRaul(e);
+    return;
   }
   if (e.hp <= 0) killEnemy(e);
 }
@@ -940,6 +946,14 @@ function loadGame() {
    LOOP PRINCIPAL
    ========================================================= */
 
+function startNewGame() {
+  if (tutorialSupported() && !tutorialWasDone()) {
+    beginTutorial('new');
+    return;
+  }
+  newGame();
+}
+
 function newGame() {
   flags = {};
   world = {};
@@ -1132,6 +1146,7 @@ function update(dt) {
 
   switch (state) {
     case 'title': updateTitle(dt); break;
+    case 'tutorial': updateTutorial(dt); break;
     case 'play': if (!trans) updatePlay(dt); break;
     case 'dialogue': updateDialogue(dt); break;
     case 'doc': updateDoc(dt); break;
@@ -1142,7 +1157,7 @@ function update(dt) {
     case 'ending': updateEnding(dt); break;
   }
 
-  if (!trans && fadeA > 0 && state !== 'ending') {
+  if (!trans && fadeA > 0) {
     fadeA = Math.max(0, fadeA - dt * 2.4);
   }
 }

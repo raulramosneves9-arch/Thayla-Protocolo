@@ -60,8 +60,8 @@ function render() {
   g.fillStyle = '#04060a';
   g.fillRect(0, 0, VIEW_W, VIEW_H);
 
-  if (state === 'title') {
-    drawTitleGame(g);
+  if (state === 'title' || state === 'tutorial') {
+    drawTitleGame(g, state === 'tutorial');
   } else if (state === 'ending') {
     g.fillStyle = '#04060a';
     g.fillRect(0, 0, VIEW_W, VIEW_H);

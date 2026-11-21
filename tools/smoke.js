@@ -139,6 +139,32 @@ function hold(code, on = true) {
 log('--- boot ---');
 check('boot', () => g.boot());
 check('title frames', () => step(30));
+check('tutorial PC completo', () => {
+  g.beginTutorial('menu');
+  step(2);
+  if (g.__thayla.getState() !== 'tutorial') throw new Error('tutorial não abriu');
+  for (let i = 0; i < g.TUT_STEPS.length; i++) {
+    const s = g.TUT_STEPS[i];
+    step(20);
+    if (s.action === 'hold') {
+      hold('KeyD', true); step(2); hold('KeyD', false);
+    } else if (s.action === 'moveMouse') {
+      g.Input.mouse.cx = (g.Input.mouse.x + 70) * g.Render.scale + g.Render.ox;
+      g.Input.mouse.cy = (g.Input.mouse.y + 40) * g.Render.scale + g.Render.oy;
+      step(2);
+    } else if (s.action === 'click') {
+      g.Input.mouse.clicked = true; step(1);
+    } else if (s.action === 'hit') {
+      press(s.key); step(1);
+    }
+    step(48);
+    if (g.__thayla.getState() === 'title' && i < g.TUT_STEPS.length - 1) {
+      throw new Error('tutorial saiu no passo ' + i);
+    }
+  }
+  if (g.__thayla.getState() !== 'title') throw new Error('não voltou ao título: ' + g.__thayla.getState());
+  if (!g.localStorage.getItem('thayla_tut_done')) throw new Error('conclusão não foi salva');
+});
 check('new game', () => g.newGame());
 check('intro dialogue frames', () => step(10));
 

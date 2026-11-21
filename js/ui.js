@@ -64,6 +64,18 @@ function hideBoot() {
 function drawHUD(g) {
   if (!room || state === 'title') return;
 
+  var topFade = g.createLinearGradient(0, 0, 0, 46);
+  topFade.addColorStop(0, 'rgba(3,7,11,0.74)');
+  topFade.addColorStop(1, 'rgba(3,7,11,0)');
+  g.fillStyle = topFade;
+  g.fillRect(0, 0, VIEW_W, 46);
+
+  var botFade = g.createLinearGradient(0, VIEW_H - 52, 0, VIEW_H);
+  botFade.addColorStop(0, 'rgba(3,7,11,0)');
+  botFade.addColorStop(1, 'rgba(3,7,11,0.74)');
+  g.fillStyle = botFade;
+  g.fillRect(0, VIEW_H - 52, VIEW_W, 52);
+
   textShadow(g, 'OBJETIVO', 12, 14, 5.6, '#5f8098');
   textShadow(g, objective, 12, 24, 7.2, '#c6dcec');
 
@@ -672,7 +684,7 @@ function drawEnding(g) {
    TELA-TÍTULO
    ========================================================= */
 
-function drawTitleGame(g) {
+function drawTitleGame(g, bgOnly) {
   var grd = g.createLinearGradient(0, 0, 0, VIEW_H);
   grd.addColorStop(0, '#0a1520');
   grd.addColorStop(0.6, '#070b12');
@@ -724,6 +736,8 @@ function drawTitleGame(g) {
   }
   g.stroke();
 
+  if (bgOnly) return;
+
   /* título */
   g.globalAlpha = 0.9;
   spacedText(g, 'THAYLA', VIEW_W / 2, 96, 44, '#e8eef4', 4, 'center');
@@ -734,18 +748,24 @@ function drawTitleGame(g) {
   outlinedText(g, 'um caso UmbrellaRaulTick', VIEW_W / 2, 138, 7, '#8aa4b8', 'center');
 
   /* menu */
-  var opts = ['NOVO JOGO'];
-  if (saveExists) opts.push('CONTINUAR');
-  var y0 = 174;
+  var opts = titleOptions();
+  var y0 = 166;
   for (var m = 0; m < opts.length; m++) {
     var sel = titleMenu === m;
-    var yy = y0 + m * 20;
+    var yy = y0 + m * 18;
     if (sel) {
-      g.globalAlpha = 0.5 + 0.4 * Math.sin(tGlobal * 4);
-      text(g, '▸', VIEW_W / 2 - 66, yy, 9, '#d8b060', 'center');
+      g.globalAlpha = 0.65 + 0.3 * Math.sin(tGlobal * 4);
+      g.fillStyle = '#d8b060';
+      var ax = VIEW_W / 2 - 80, ay = yy - 3;
+      g.beginPath();
+      g.moveTo(ax, ay - 4);
+      g.lineTo(ax + 6, ay);
+      g.lineTo(ax, ay + 4);
+      g.closePath();
+      g.fill();
       g.globalAlpha = 1;
     }
-    text(g, opts[m], VIEW_W / 2, yy, 9.5,
+    textShadow(g, opts[m].label, VIEW_W / 2, yy, 9.5,
       sel ? '#f0e6cc' : '#7f96a8', 'center', sel);
   }
 
@@ -753,28 +773,249 @@ function drawTitleGame(g) {
   outlinedText(g, 'E INTERAGIR  ·  TAB INVENTÁRIO  ·  H ERVA  ·  Q ARMA  ·  [M] SOM ' + (Sfx.isMuted() ? 'OFF' : 'ON'), VIEW_W / 2, VIEW_H - 14, 5.4, '#4f6a80', 'center');
 }
 
+function titleOptions() {
+  var opts = [{ label: 'NOVO JOGO', action: 'new' }];
+  if (tutorialSupported()) opts.push({ label: 'TUTORIAL (PC)', action: 'tutorial' });
+  if (saveExists) opts.push({ label: 'CONTINUAR', action: 'continue' });
+  return opts;
+}
+
+function titleChoose(action) {
+  if (action === 'continue') loadGame();
+  else if (action === 'tutorial') beginTutorial('menu');
+  else startNewGame();
+}
+
 function updateTitle(dt) {
   var hasSave = saveExists;
-  var n = hasSave ? 2 : 1;
+  var opts = titleOptions();
+  var n = opts.length;
+  if (titleMenu >= n) titleMenu = 0;
+
   if (Input.anyHit(['ArrowDown', 'KeyS'])) { titleMenu = (titleMenu + 1) % n; Sfx.ui(); }
   if (Input.anyHit(['ArrowUp', 'KeyW'])) { titleMenu = (titleMenu + n - 1) % n; Sfx.ui(); }
 
   if (Input.hit('KeyC') && hasSave) { loadGame(); return; }
   if (Input.hit('Enter') || Input.hit('Space')) {
-    if (titleMenu === 1 && hasSave) loadGame();
-    else newGame();
+    titleChoose(opts[titleMenu].action);
     return;
   }
   if (Input.mouse.clicked) {
     for (var m = 0; m < n; m++) {
-      var yy = 174 + m * 20;
-      if (Math.abs(Input.mouse.x - VIEW_W / 2) < 70 &&
+      var yy = 166 + m * 18;
+      if (Math.abs(Input.mouse.x - VIEW_W / 2) < 82 &&
           Input.mouse.y > yy - 11 && Input.mouse.y < yy + 5) {
-        if (m === 1 && hasSave) loadGame(); else newGame();
+        titleMenu = m;
+        titleChoose(opts[m].action);
         return;
       }
     }
   }
+}
+
+/* =========================================================
+   TUTORIAL (SOMENTE PC)
+   ========================================================= */
+
+var tut = {
+  mode: 'menu', step: 0, t: 0, stepT: 0, waitT: 0,
+  mouseX0: 0, mouseY0: 0
+};
+
+var TUT_STEPS = [
+  {
+    action: 'hold', code: 'WASD', keys: ['KeyW', 'KeyA', 'KeyS', 'KeyD'],
+    title: 'MOVIMENTAÇÃO', hint: 'SEGURE W, A, S OU D',
+    text: 'Use W, A, S e D para mover Thayla pelo cenário.'
+  },
+  {
+    action: 'moveMouse', code: 'MOUSE', title: 'MIRA', hint: 'MOVA O CURSOR',
+    text: 'Mova o mouse para apontar a arma. A mira acompanha o cursor.'
+  },
+  {
+    action: 'click', code: 'CLIQUE', title: 'ATIRAR', hint: 'CLIQUE COM O BOTÃO ESQUERDO',
+    text: 'Clique com o botão esquerdo para disparar. Fique de olho na munição.'
+  },
+  {
+    action: 'hit', key: 'KeyF', code: 'F', title: 'FACA', hint: 'APERTE A TECLA',
+    text: 'Aperte F para atacar com a faca quando a munição acabar.'
+  },
+  {
+    action: 'hit', key: 'Space', code: 'ESPAÇO', title: 'ESQUIVA', hint: 'APERTE A TECLA',
+    text: 'Aperte Espaço para rolar e escapar de mordidas e ataques.'
+  },
+  {
+    action: 'hit', key: 'KeyE', code: 'E', title: 'INTERAGIR', hint: 'APERTE A TECLA',
+    text: 'Use E para abrir portas, ler cartas e pegar itens próximos.'
+  },
+  {
+    action: 'hit', key: 'Tab', code: 'TAB', title: 'INVENTÁRIO', hint: 'APERTE A TECLA',
+    text: 'Tab abre a bolsa. Confira munição, ervas e itens de missão.'
+  },
+  {
+    action: 'hit', key: 'KeyH', code: 'H', title: 'ERVAS', hint: 'APERTE A TECLA',
+    text: 'Aperte H para usar uma erva medicinal e recuperar vida.'
+  },
+  {
+    action: 'hit', key: 'KeyQ', code: 'Q', title: 'TROCAR ARMA', hint: 'APERTE A TECLA',
+    text: 'Aperte Q para alternar entre a pistola e a escopeta, quando tiver as duas.'
+  }
+];
+
+function tutorialSupported() {
+  try {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(pointer: fine)').matches;
+    }
+  } catch (e) {}
+  return true;
+}
+
+function tutorialWasDone() {
+  try { return !!localStorage.getItem('thayla_tut_done'); }
+  catch (e) { return true; }
+}
+
+function beginTutorial(mode) {
+  tut.mode = mode || 'menu';
+  tut.step = 0;
+  tut.t = 0;
+  tut.stepT = 0;
+  tut.waitT = 0;
+  tut.mouseX0 = Input.mouse.x;
+  tut.mouseY0 = Input.mouse.y;
+  state = 'tutorial';
+  fadeA = 1;
+  Sfx.ui();
+}
+
+function finishTutorial(skipped) {
+  try { localStorage.setItem('thayla_tut_done', '1'); } catch (e) {}
+
+  if (tut.mode === 'new') {
+    newGame();
+  } else {
+    backToTitle();
+    if (!skipped) showToast('TREINAMENTO CONCLUÍDO');
+  }
+}
+
+function updateTutorial(dt) {
+  tut.t += dt;
+
+  if (tut.waitT > 0) {
+    tut.waitT -= dt;
+    if (tut.waitT <= 0) {
+      tut.step++;
+      tut.stepT = 0;
+      if (tut.step >= TUT_STEPS.length) { finishTutorial(false); return; }
+      tut.mouseX0 = Input.mouse.x;
+      tut.mouseY0 = Input.mouse.y;
+      Sfx.ui();
+    }
+    return;
+  }
+
+  if (Input.hit('Escape')) { finishTutorial(true); return; }
+
+  tut.stepT += dt;
+  if (tut.stepT < 0.22) return;
+
+  var s = TUT_STEPS[tut.step];
+  var ok = false;
+  if (s.action === 'hold') ok = Input.any(s.keys);
+  else if (s.action === 'hit') ok = Input.hit(s.key);
+  else if (s.action === 'click') ok = Input.mouse.clicked;
+  else if (s.action === 'moveMouse') {
+    ok = Math.abs(Input.mouse.x - tut.mouseX0) +
+      Math.abs(Input.mouse.y - tut.mouseY0) > 30;
+  }
+
+  if (ok) {
+    tut.waitT = 0.6;
+    Sfx.pickup();
+  }
+}
+
+function drawTutorial(g) {
+  g.fillStyle = 'rgba(3,6,10,0.74)';
+  g.fillRect(0, 0, VIEW_W, VIEW_H);
+
+  var x = Math.round((VIEW_W - 352) / 2);
+  var y = Math.round((VIEW_H - 226) / 2);
+  var w = 352, h = 226;
+  panelBox(g, x, y, w, h, 0.95);
+
+  g.fillStyle = '#b03a2a';
+  g.fillRect(x, y, w, 2);
+
+  spacedText(g, 'TREINAMENTO TÁTICO · PC', x + 18, y + 18, 5.2, '#b06a5a', 1.6, 'left');
+  text(g, 'COMO JOGAR', x + 18, y + 35, 11, '#e8eef4', 'left', true);
+
+  var s = TUT_STEPS[tut.step];
+  var num = tut.step + 1;
+  text(g, (num < 10 ? '0' : '') + num + ' / ' + (TUT_STEPS.length < 10 ? '0' : '') + TUT_STEPS.length,
+    x + w - 18, y + 33, 6.4, '#7f97aa', 'right', true);
+
+  g.fillStyle = 'rgba(150,175,195,0.18)';
+  g.fillRect(x + 18, y + 44, w - 36, 1);
+
+  /* tecla em destaque */
+  var kx = VIEW_W / 2, ky = y + 82;
+  var kw = Math.max(96, Math.min(196, s.code.length * 15 + 34));
+  var pulse = tut.waitT > 0 ? 1 : 0.5 + 0.5 * Math.sin(tut.t * 3.2);
+
+  g.globalAlpha = 0.10 + pulse * 0.10;
+  fillEllipse(g, kx, ky, kw * 0.62, 28, '#d8b060');
+  g.globalAlpha = 1;
+
+  var kg = g.createLinearGradient(0, ky - 22, 0, ky + 22);
+  kg.addColorStop(0, tut.waitT > 0 ? '#253b2c' : '#1b2a37');
+  kg.addColorStop(1, '#091017');
+  g.fillStyle = kg;
+  g.fillRect(kx - kw / 2, ky - 22, kw, 44);
+  g.strokeStyle = tut.waitT > 0
+    ? 'rgba(130,210,150,' + (0.55 + pulse * 0.35) + ')'
+    : 'rgba(216,176,96,' + (0.45 + pulse * 0.35) + ')';
+  g.lineWidth = 1.5;
+  g.strokeRect(kx - kw / 2 + 0.5, ky - 21.5, kw - 1, 43);
+  g.fillStyle = 'rgba(255,255,255,0.06)';
+  g.fillRect(kx - kw / 2 + 2, ky - 20, kw - 4, 1);
+
+  var codePx = s.code.length <= 2 ? 20 : (s.code.length <= 4 ? 15 : 11);
+  text(g, s.code, kx, ky + codePx * 0.36, codePx, tut.waitT > 0 ? '#b8e8c4' : '#f0e6cc', 'center', true);
+
+  /* instrução */
+  text(g, s.title, VIEW_W / 2, y + 126, 8.6, '#d8b060', 'center', true);
+  var lines = wrapLines(g, s.text, 296, 6.8);
+  for (var i = 0; i < lines.length && i < 3; i++) {
+    text(g, lines[i], VIEW_W / 2, y + 141 + i * 10, 6.8, '#a9bfd0', 'center');
+  }
+
+  var status = tut.waitT > 0 ? '✓  ' + s.title + ' CONCLUÍDO' : s.hint;
+  text(g, status, VIEW_W / 2, y + 184, 5.8,
+    tut.waitT > 0 ? '#7ad07a' : '#6f8a9e', 'center', tut.waitT > 0);
+
+  /* progresso */
+  var dotW = TUT_STEPS.length * 12 - 6;
+  var dx = VIEW_W / 2 - dotW / 2 + 3;
+  for (var d = 0; d < TUT_STEPS.length; d++) {
+    var px = dx + d * 12;
+    if (d < tut.step || (d === tut.step && tut.waitT > 0)) {
+      fillCircle(g, px, y + 198, 2.4, '#69c46e');
+    } else if (d === tut.step) {
+      fillCircle(g, px, y + 198, 2.8, '#d8b060');
+      g.strokeStyle = 'rgba(216,176,96,0.35)';
+      g.lineWidth = 1;
+      g.beginPath();
+      g.arc(px, y + 198, 4.4, 0, Math.PI * 2);
+      g.stroke();
+    } else {
+      fillCircle(g, px, y + 198, 2, '#25333f');
+    }
+  }
+
+  text(g, '[ESC] PULAR TREINAMENTO', VIEW_W / 2, y + 216, 5.4, '#5c7488', 'center');
 }
 
 /* =========================================================
@@ -790,6 +1031,7 @@ function drawOverlayUI(g) {
   }
 
   if (state === 'dialogue') drawDialogue(g);
+  if (state === 'tutorial') drawTutorial(g);
   if (state === 'doc') drawDoc(g);
   if (state === 'inv') drawInventory(g);
   if (state === 'keypad') drawKeypad(g);

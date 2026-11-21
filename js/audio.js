@@ -102,18 +102,44 @@ var Sfx = (function () {
     },
 
     shoot: function () {
-      noise(0.09, 2600, 0.8, 0.32);
-      tone(150, 0.09, 'square', 0.14, 60);
+      noise(0.045, 5200, 1.2, 0.4, 'highpass');
+      noise(0.12, 1700, 0.7, 0.34, 'bandpass');
+      tone(180, 0.1, 'square', 0.2, 52);
+      tone(74, 0.15, 'sine', 0.16, 38);
     },
     shotgun: function () {
-      noise(0.26, 1200, 0.6, 0.5);
-      tone(90, 0.22, 'sawtooth', 0.2, 40);
+      noise(0.07, 4200, 1.1, 0.42, 'highpass');
+      noise(0.32, 950, 0.55, 0.55, 'lowpass');
+      tone(88, 0.28, 'sawtooth', 0.26, 30);
+      tone(46, 0.4, 'sine', 0.22, 26);
     },
     dry: function () { noise(0.03, 3000, 1, 0.12, 'highpass'); },
     knife: function () { noise(0.11, 4200, 1.2, 0.16, 'highpass'); },
-    hit: function () { noise(0.05, 900, 1, 0.22); },
+    hit: function () {
+      noise(0.05, 1000, 1, 0.24, 'bandpass');
+      tone(160, 0.05, 'square', 0.05, 90);
+    },
+    enemyHurt: function () {
+      noise(0.07, 750, 0.9, 0.26);
+      tone(rand(95, 130), 0.08, 'square', 0.06, 60);
+    },
     splat: function () { noise(0.16, 420, 0.7, 0.26); tone(90, 0.14, 'sine', 0.1, 40); },
-    hurt: function () { tone(240, 0.22, 'sawtooth', 0.16, 90); noise(0.12, 700, 1, 0.2); },
+    hurt: function () {
+      tone(260, 0.18, 'sawtooth', 0.2, 95);
+      tone(120, 0.28, 'triangle', 0.14, 60);
+      noise(0.15, 850, 1, 0.22, 'bandpass');
+    },
+    mutate: function () {
+      noise(0.9, 240, 0.7, 0.28);
+      tone(54, 1.2, 'sawtooth', 0.22, 26);
+      tone(81, 0.9, 'square', 0.08, 40);
+      setTimeout(function () { noise(0.12, 1200, 1.2, 0.14, 'bandpass'); }, 220);
+      setTimeout(function () { noise(0.16, 600, 1.2, 0.16, 'bandpass'); }, 520);
+    },
+    revert: function () {
+      tone(90, 0.8, 'sine', 0.12, 240);
+      noise(0.5, 500, 0.8, 0.1);
+    },
     pickup: function () { tone(620, 0.07, 'square', 0.09); tone(880, 0.09, 'square', 0.07); },
     key: function () { tone(523, 0.08, 'triangle', 0.1); tone(784, 0.12, 'triangle', 0.09); },
     door: function () { noise(0.3, 320, 0.8, 0.2); tone(70, 0.3, 'sine', 0.1, 45); },
@@ -130,8 +156,11 @@ var Sfx = (function () {
     alarm: function () { tone(880, 0.25, 'square', 0.07, 660); },
     inject: function () { tone(180, 0.5, 'sine', 0.12, 420); noise(0.3, 1500, 1, 0.08); },
     save: function () { tone(392, 0.12, 'triangle', 0.09); tone(523, 0.12, 'triangle', 0.09); tone(784, 0.4, 'triangle', 0.09); },
-    ending: function () {
-      [261.6, 329.6, 392, 523.2].forEach(function (f, i) {
+    ending: function (kind) {
+      var seq = kind === 'shoot' ? [196, 174.6, 146.8, 110]
+        : kind === 'leave' ? [174.6, 155.6, 130.8]
+        : [261.6, 329.6, 392, 523.2];
+      seq.forEach(function (f, i) {
         setTimeout(function () { tone(f, 2.2, 'sine', 0.07); }, i * 260);
       });
     }
